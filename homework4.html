@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>
+		hw4
+	</title>
+	<style type="text/css">
+	h2 {padding-top: 180px;text-align: center;}
+	form { text-align: center;}	
+	input {
+		padding:10px;
+		width: 20%;
+		padding-bottom: 10px;
+	}
+	button {
+		margin-top: 15px;
+		padding:10px;
+		width:10%;
+	}
+	</style>
+	<script type="text/javascript">
+		var jsonDoc; 
+		function loadJSON (url) { 
+		var xmlhttp=new XMLHttpRequest(); 
+     	 xmlhttp.open('GET',url,false); 
+     	 if(xmlhttp.status==404) {
+     	 	alert("file does not exists");
+     	 	exit(0);
+     	 }
+     	 xmlhttp.send();    
+
+
+      	jsonDoc=xmlhttp.responseText; 
+     	 return jsonDoc; 
+     	}
+     	function displayJsonData(jsonurl) {
+     		var jsondata=loadJSON(jsonurl);
+     		//document.write(jsondata);
+     		var extractedHeader=[];
+     		var obj=JSON.parse(jsondata);
+     		var finaljson=JSON.stringify(obj);
+     		var z=0;
+     		//Extracting table headers from the json file
+     		for(var j=0; j< ((obj.Mainline.Table.Header.Data).length);j++)
+     		{
+     			if(j<(obj.Mainline.Table.Header.Data).length)
+     			{
+     		 extractedHeader[z] = obj.Mainline.Table.Header.Data[j];
+     			}
+     		/*else if(j<(obj.Header.Data).length)
+     		{ extractedHeader[z]= obj.Header.Data[j]; }*/
+     		 z++;
+     		
+     		}
+     		//loop to extract the row data
+     		var m=0; var rowdata=[];var eachrow=[];
+     		var n=0;
+     		//to handle json file with 0 ROW entries
+     		if(obj.Mainline.Table.Row == null) {
+     			window.alert("No trucking company entries listed in the JSON file ");
+     		}
+     		if(obj == null) {
+     			window.alert("FILE DOES NOT EXIST, USE ANOTHER FILE");
+     		}
+
+     		for(var k=0;k < ((obj.Mainline.Table.Row).length || (obj.Row).length);k++)
+     		{
+     			rowdata[m]= obj.Mainline.Table.Row[k];
+     			//rowdata[m]=obj.Row[k];
+     			m++;
+     		}
+
+     		var displaywindow=window.open("","_blank","scrollbars=yes,width=900px,height=800px,resizable=yes");
+     		    displaywindow.document.write('<html><body><table border="1">');
+     		    displaywindow.document.write('<tr>');
+     		    for (var i=0;i<extractedHeader.length;i++)
+     		    {	
+     		    	
+     		    	displaywindow.document.write('<th>'+extractedHeader[i]+'</th>');
+     		    }
+     		    displaywindow.document.write('</tr>');
+     		    //for(var f=0;f < ((obj.Mainline.Table.Row).length || (obj.Row).length);f++) {
+     		    	
+     			for(var k=0;k < rowdata.length;k++) {
+     				displaywindow.document.write('<tr>');
+     				displaywindow.document.write('<td>'+rowdata[k].Company+'</td>');
+     				if(rowdata[k].Services == ""|| rowdata[k].Services == null) {
+     					displaywindow.document.write("<td></td>");
+     				}
+     				else {
+     				displaywindow.document.write('<td>'+rowdata[k].Services+'</td>');
+     			}
+     				displaywindow.document.write('<td><ul>');
+       				for(var hubcount=0;hubcount < (rowdata[k].Hubs.Hub).length;hubcount++) {
+       					//To display empty columns in case hubs does not contain any items
+       					if((rowdata[k].Hubs.Hub).length == 0 || (rowdata[k].Hubs == "" || rowdata[k].Hubs.Hub == null))
+       					{
+       						displaywindow.document.write('<td></td>');
+       					}
+       						if(hubcount==0) {
+       							displaywindow.document.write('<B><li>'+rowdata[k].Hubs.Hub[hubcount]+'</li></B>');
+       						}
+       						else {
+       						displaywindow.document.write('<li>'+rowdata[k].Hubs.Hub[hubcount]+'</li>');
+       					}
+       				}
+     				displaywindow.document.write('</ul></td>');
+     				if(rowdata[k].Revenue == null) {
+     					//to leave the place blank in case revenue has no value assigned
+     						displaywindow.document.write('<td></td>');
+     				}
+     				else
+     					{
+     						displaywindow.document.write('<td>'+rowdata[k].Revenue+'</td>');
+     					}
+     				if(rowdata[k].HomePage == null) {
+     					displaywindow.document.write('<td></td>');
+     				}
+     				else{
+     				displaywindow.document.write('<td><a href="'+rowdata[k].HomePage+'">'+rowdata[k].HomePage+'</a></td>');
+     					}
+     				if(rowdata[k].Logo == null ) {
+     					displaywindow.document.write('<td></td>');
+
+     				}
+     				else {
+     				displaywindow.document.write('<td><img src="'+rowdata[k].Logo+'" width="250px" height="200px"/></td>');
+     				}
+
+     					displaywindow.document.write('</tr>');
+     		
+     			}
+     			//displaywindow.document.write('<td>'+finaljson+'</td>');
+     			displaywindow.document.write('</table></body></html>');
+
+     		
+     	}
+     	
+	</script>
+</head>
+<body>
+<h2> Enter the URL for Trucking List JSON File</h2>
+<form>
+<input type="text" id="Jsonfile" >
+</input><br/>
+<button type="submit" value="submit" onClick="displayJsonData(document.getElementById('Jsonfile').value)">Submit Query</button>
+</form>
+</body>
+</html>
